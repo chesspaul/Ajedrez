@@ -1,0 +1,82 @@
+nav {
+    display: flex;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 24px;
+}
+
+nav a {
+    text-decoration: none;
+    color: #085041;
+}
+
+input {
+    display: block;
+    margin-bottom: 10px;
+    padding: 8px 12px;
+    width: 100%;
+    max-width: 300px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+button {
+    padding: 8px 20px;
+    background: #085041;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.flash {
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    max-width: 400px;
+}
+
+.flash.error { background: #FCEBEB; color: #791F1F; }
+.flash.exito { background: #E1F5EE; color: #085041; }
+
+.nota-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    max-width: 500px;
+}
+
+.nota-card h3 {
+    margin: 0 0 8px;
+}
+
+.nota-acciones {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.nota-acciones a {
+    color: #085041;
+    text-decoration: none;
+}
+
+.nota-acciones button {
+    background: #791F1F;
+    padding: 4px 12px;
+    font-size: 13px;
+}
+
+textarea {
+    display: block;
+    width: 100%;
+    max-width: 400px;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    font-family: sans-serif;
+}

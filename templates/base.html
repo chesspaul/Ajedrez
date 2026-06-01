@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
+    <title>Mi App</title>
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('auth.inicio') }}">Inicio</a>
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('notas.ver_notas') }}">Mis notas</a>
+            <a href="{{ url_for('auth.logout') }}">Cerrar sesión</a>
+        {% else %}
+            <a href="{{ url_for('auth.login') }}">Iniciar sesión</a>
+            <a href="{{ url_for('auth.registro') }}">Registrarse</a>
+        {% endif %}
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for categoria, mensaje in messages %}
+            <p class="flash {{ categoria }}">{{ mensaje }}</p>
+        {% endfor %}
+    {% endwith %}
+
+    {% block contenido %}{% endblock %}
+</body>
+</html>

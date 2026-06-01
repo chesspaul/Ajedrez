@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block contenido %}
+<h1>Mis notas</h1>
+<a href="{{ url_for('notas.nueva_nota') }}">+ Nueva nota</a>
+
+{% if notas %}
+    {% for nota in notas %}
+    <div class="nota-card">
+        <h3>{{ nota.titulo }}</h3>
+        <p>{{ nota.contenido }}</p>
+        <div class="nota-acciones">
+            <a href="{{ url_for('notas.editar_nota', nota_id=nota.id) }}">Editar</a>
+            <form method="POST" action="{{ url_for('notas.borrar_nota', nota_id=nota.id) }}">
+                <button type="submit" onclick="return confirm('¿Seguro que quieres borrar esta nota?')">
+                    Borrar
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <p>No tienes notas todavía.</p>
+{% endif %}
+{% endblock %}

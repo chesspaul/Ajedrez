@@ -12,6 +12,7 @@
         {% if current_user.is_authenticated %}
             <a href="{{ url_for('notas.ver_notas') }}">Mis notas</a>
             <a href="{{ url_for('auth.logout') }}">Cerrar sesión</a>
+            <a href="{{ url_for('ajedrez.jugar') }}">Ajedrez</a>
         {% else %}
             <a href="{{ url_for('auth.login') }}">Iniciar sesión</a>
             <a href="{{ url_for('auth.registro') }}">Registrarse</a>

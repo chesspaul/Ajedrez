@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_login import LoginManager
 from .models import db, Usuario
+from .ajedrez.routes import ajedrez
 
 
 def create_app():
@@ -23,6 +24,7 @@ def create_app():
 
     app.register_blueprint(auth)
     app.register_blueprint(notas)
+    app.register_blueprint(ajedrez)
 
     with app.app_context():
         db.create_all()

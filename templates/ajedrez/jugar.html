@@ -8,6 +8,13 @@
 <div id="tablero" style="width: 480px; margin: 20px 0;"></div>
 
 <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+  <label for="dificultad">Dificultad IA:</label>
+  <select id="dificultad">
+    <option value="2">Fácil</option>
+    <option value="6" selected>Medio</option>
+    <option value="12">Difícil</option>
+    <option value="12">Experto</option>
+  </select>
   <button onclick="reiniciar()">Reiniciar</button>
   <button onclick="toggleModo()">Modo: <span id="modo-label">2 jugadores</span></button>
 </div>
@@ -21,6 +28,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<script src="{{ url_for('static', filename='stockfish.js') }}"></script>
 
 <script>
   var juego = new Chess();
@@ -64,16 +72,34 @@
     tablero.position(juego.fen());
   }
 
-  function moverIA() {
-    var movimientos = juego.moves();
-    if (movimientos.length === 0) return;
-    var movimiento = movimientos[Math.floor(Math.random() * movimientos.length)];
-    juego.move(movimiento);
-    tablero.position(juego.fen());
-    registrarMovimiento(juego.history({ verbose: true }).slice(-1)[0]);
-    actualizarEstado();
-  }
+  var motor = new Worker("{{ url_for('static', filename='stockfish.js') }}");
+  motor.postMessage('uci');
 
+  motor.onmessage = function(evento) {
+    var mensaje = evento.data;
+    if (mensaje.startsWith('bestmove')) {
+      var partes = mensaje.split(' ');
+      var mejor = partes[1];
+      if (mejor && mejor !== '(none)') {
+        var movimiento = juego.move({
+          from: mejor.substring(0, 2),
+          to: mejor.substring(2, 4),
+          promotion: mejor.length > 4 ? mejor[4] : 'q'
+      });
+      if (movimiento) {
+        tablero.position(juego.fen());
+        registrarMovimiento(movimiento);
+        actualizarEstado();
+      }
+    }
+  }
+};
+
+  function moverIA() {
+    var nivel = parseInt(document.getElementById('dificultad').value);
+    motor.postMessage('position fen ' + juego.fen());
+    motor.postMessage('go depth ' + nivel);
+  }
   function registrarMovimiento(mov) {
     historialMovimientos.push(mov.san);
     var num = Math.ceil(historialMovimientos.length / 2);

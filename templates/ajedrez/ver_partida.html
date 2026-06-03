@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<h1>Reproducción de partida</h1>
+<p>Modo: {{ partida.modo }} | Resultado: {{ partida.resultado }} | Fecha: {{ partida.fecha.strftime('%d/%m/%Y %H:%M') }}</p>
+
+<div id="tablero" style="width: 480px; margin: 20px 0;"></div>
+
+<div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center;">
+  <button onclick="anterior()">← Anterior</button>
+  <button onclick="siguiente()">Siguiente →</button>
+  <button onclick="irAlInicio()">⏮ Inicio</button>
+  <button onclick="irAlFinal()">⏭ Final</button>
+  <span id="contador" style="font-size:13px; color:#666;">Movimiento 0 / 0</span>
+</div>
+
+<div id="movimiento-actual" style="font-family:monospace; font-size:14px; margin-bottom:10px;"></div>
+
+<h3>Movimientos</h3>
+<div id="historial" style="font-family: monospace; font-size: 13px; max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; max-width: 480px;"></div>
+
+<a href="{{ url_for('ajedrez.historial') }}">← Volver al historial</a>
+
+<link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+
+<script>
+  var movimientos = "{{ partida.movimientos }}".replace(/,/g, ' ').split(" ").filter(function(m) { return m.trim() !== ""; });
+  var indice = 0;
+  var juego = new Chess();
+
+  var tablero = Chessboard('tablero', {
+    position: 'start',
+    pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
+  });
+
+  function renderHistorial() {
+    var div = document.getElementById('historial');
+    div.innerHTML = '';
+    for (var i = 0; i < movimientos.length; i++) {
+      var span = document.createElement('span');
+      span.id = 'mov-' + i;
+      if (i % 2 === 0) span.innerHTML = Math.floor(i/2 + 1) + '. ';
+      span.innerHTML += movimientos[i] + ' ';
+      if (i === indice - 1) span.style.background = '#E1F5EE';
+      div.appendChild(span);
+    }
+  }
+
+  function actualizarContador() {
+    document.getElementById('contador').textContent = 'Movimiento ' + indice + ' / ' + movimientos.length;
+    var mov = indice > 0 ? movimientos[indice - 1] : '—';
+    document.getElementById('movimiento-actual').textContent = 'Último movimiento: ' + mov;
+  }
+
+  function siguiente() {
+    if (indice >= movimientos.length) return;
+    juego.move(movimientos[indice]);
+    indice++;
+    tablero.position(juego.fen());
+    actualizarContador();
+    renderHistorial();
+  }
+
+  function anterior() {
+    if (indice <= 0) return;
+    juego.undo();
+    indice--;
+    tablero.position(juego.fen());
+    actualizarContador();
+    renderHistorial();
+  }
+
+  function irAlInicio() {
+    juego.reset();
+    indice = 0;
+    tablero.position('start');
+    actualizarContador();
+    renderHistorial();
+  }
+
+  function irAlFinal() {
+    while (indice < movimientos.length) {
+      juego.move(movimientos[indice]);
+      indice++;
+    }
+    tablero.position(juego.fen());
+    actualizarContador();
+    renderHistorial();
+  }
+
+  renderHistorial();
+  actualizarContador();
+</script>
+
+{% endblock %}

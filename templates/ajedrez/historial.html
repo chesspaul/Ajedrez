@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<h1>Mis partidas</h1>
+<a href="{{ url_for('ajedrez.jugar') }}">Jugar nueva partida</a>
+
+{% if partidas %}
+<table style="width:100%; max-width:600px; border-collapse:collapse; margin-top:16px;">
+  <thead>
+    <tr style="border-bottom: 2px solid #ddd; text-align:left;">
+      <th style="padding:8px;">Fecha</th>
+      <th style="padding:8px;">Modo</th>
+      <th style="padding:8px;">Dificultad</th>
+      <th style="padding:8px;">Resultado</th>
+      <th style="padding:8px;">Movimientos</th>
+      <th style="padding:8px;">Ver</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in partidas %}
+    <tr style="border-bottom: 1px solid #eee;">
+      <td style="padding:8px;">{{ p.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
+      <td style="padding:8px;">{{ p.modo }}</td>
+      <td style="padding:8px;">{{ p.dificultad if p.dificultad else '—' }}</td>
+      <td style="padding:8px;">{{ p.resultado }}</td>
+      <td style="padding:8px;">{{ p.movimientos }}</td>
+      <td style="padding:8px;"> <a href="{{ url_for('ajedrez.ver_partida', partida_id=p.id) }}">Ver</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No tienes partidas guardadas todavía.</p>
+{% endif %}
+
+{% endblock %}

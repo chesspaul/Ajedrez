@@ -13,7 +13,7 @@
     <option value="2">Fácil</option>
     <option value="6" selected>Medio</option>
     <option value="12">Difícil</option>
-    <option value="12">Experto</option>
+    <option value="20">Experto</option>
   </select>
   <button onclick="reiniciar()">Reiniciar</button>
   <button onclick="toggleModo()">Modo: <span id="modo-label">2 jugadores</span></button>
@@ -120,9 +120,11 @@
       var ganador = juego.turn() === 'w' ? 'Negras' : 'Blancas';
       estadoEl.textContent = '¡Jaque mate! Ganan ' + ganador;
       turnoEl.textContent = '—';
+      guardarPartida(ganador.toLocaleLowerCase());
     } else if (juego.in_draw()) {
       estadoEl.textContent = 'Empate';
       turnoEl.textContent = '—';
+      guardarPartida('empate');
     } else if (juego.in_check()) {
       turnoEl.textContent = juego.turn() === 'w' ? 'Blancas' : 'Negras';
       estadoEl.textContent = '¡Jaque!';
@@ -130,6 +132,22 @@
       turnoEl.textContent = juego.turn() === 'w' ? 'Blancas' : 'Negras';
       estadoEl.textContent = '';
     }
+  }
+
+  function guardarPartida(resultado){
+    var datos = {
+      modo : modoIA ? 'vs_ia' : '2jugadores',
+      dificultad : modoIA ? parseInt(document.getElementById('dificultad').value) : null,
+      resultado : resultado,
+      movimientos : historialMovimientos.join(' ')
+    };
+
+    fetch('/ajedrez/guardar',{
+      method:"POST",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datos)
+    })
+
   }
 
   function reiniciar() {

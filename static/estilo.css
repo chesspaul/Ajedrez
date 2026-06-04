@@ -1,82 +1,242 @@
+/* ── Variables de color ── */
+:root {
+  --principal: #5C4AE4;
+  --principal-oscuro: #3D2EB8;
+  --acento: #00C896;
+  --acento-oscuro: #00A87E;
+  --fondo: #0F0F1A;
+  --fondo-card: #1A1A2E;
+  --fondo-card2: #16213E;
+  --texto: #E8E8F0;
+  --texto-secundario: #9090B0;
+  --borde: #2A2A4A;
+  --error: #FF4C6A;
+  --exito: #00C896;
+}
+
+/* ── Base ── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: var(--fondo);
+  color: var(--texto);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* ── Nav ── */
 nav {
-    display: flex;
-    gap: 16px;
-    padding: 12px 0;
-    border-bottom: 1px solid #ddd;
-    margin-bottom: 24px;
+  background: var(--fondo-card);
+  border-bottom: 1px solid var(--borde);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
 }
 
 nav a {
-    text-decoration: none;
-    color: #085041;
+  color: var(--texto-secundario);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s;
 }
 
-input {
-    display: block;
-    margin-bottom: 10px;
-    padding: 8px 12px;
-    width: 100%;
-    max-width: 300px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
+nav a:hover { color: var(--acento); }
+
+nav a:first-child {
+  color: var(--principal);
+  font-size: 16px;
+  font-weight: 700;
+  margin-right: auto;
 }
 
+/* ── Contenido principal ── */
+body > nav + * ,
+body > nav ~ p,
+.contenido {
+  padding: 32px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  background: linear-gradient(90deg, var(--principal), var(--acento));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+h2 { font-size: 20px; margin-bottom: 12px; color: var(--texto); }
+h3 { font-size: 16px; margin-bottom: 8px; color: var(--texto-secundario); }
+
+p { color: var(--texto-secundario); margin-bottom: 12px; }
+
+a { color: var(--acento); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ── Botones ── */
 button {
-    padding: 8px 20px;
-    background: #085041;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
+  padding: 9px 20px;
+  background: var(--principal);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background 0.2s, transform 0.1s;
 }
 
-.flash {
-    padding: 8px 12px;
-    border-radius: 6px;
-    margin-bottom: 12px;
-    max-width: 400px;
+button:hover { background: var(--principal-oscuro); transform: translateY(-1px); }
+button:active { transform: translateY(0); }
+
+/* ── Inputs ── */
+input, textarea, select {
+  display: block;
+  width: 100%;
+  max-width: 380px;
+  padding: 10px 14px;
+  background: var(--fondo-card2);
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  color: var(--texto);
+  font-size: 14px;
+  margin-bottom: 12px;
+  transition: border-color 0.2s;
+  font-family: 'Segoe UI', sans-serif;
 }
 
-.flash.error { background: #FCEBEB; color: #791F1F; }
-.flash.exito { background: #E1F5EE; color: #085041; }
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--principal);
+}
 
+select option { background: var(--fondo-card2); }
+
+label {
+  font-size: 13px;
+  color: var(--texto-secundario);
+  margin-bottom: 4px;
+  display: block;
+}
+
+/* ── Cards ── */
 .nota-card {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 12px;
-    max-width: 500px;
+  background: var(--fondo-card);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 12px;
+  max-width: 520px;
+  transition: border-color 0.2s;
 }
 
-.nota-card h3 {
-    margin: 0 0 8px;
-}
+.nota-card:hover { border-color: var(--principal); }
+.nota-card h3 { color: var(--texto); margin-bottom: 6px; }
+.nota-card p { margin-bottom: 0; }
 
 .nota-acciones {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 12px;
 }
 
 .nota-acciones a {
-    color: #085041;
-    text-decoration: none;
+  color: var(--acento);
+  font-size: 13px;
 }
 
 .nota-acciones button {
-    background: #791F1F;
-    padding: 4px 12px;
-    font-size: 13px;
+  background: transparent;
+  border: 1px solid var(--error);
+  color: var(--error);
+  padding: 4px 12px;
+  font-size: 12px;
 }
 
-textarea {
-    display: block;
-    width: 100%;
-    max-width: 400px;
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    margin-bottom: 10px;
-    font-family: sans-serif;
+.nota-acciones button:hover { background: var(--error); color: white; }
+
+/* ── Flash messages ── */
+.flash {
+  padding: 10px 16px;
+  border-radius: 8px;
+  margin: 12px 32px;
+  max-width: 500px;
+  font-size: 13px;
+}
+
+.flash.error {
+  background: rgba(255, 76, 106, 0.15);
+  border: 1px solid var(--error);
+  color: #FF8FA3;
+}
+
+.flash.exito {
+  background: rgba(0, 200, 150, 0.15);
+  border: 1px solid var(--acento);
+  color: var(--acento);
+}
+
+/* ── Tabla historial ── */
+table {
+  width: 100%;
+  max-width: 700px;
+  border-collapse: collapse;
+  margin-top: 16px;
+  font-size: 13px;
+}
+
+thead tr {
+  border-bottom: 2px solid var(--borde);
+}
+
+th {
+  padding: 10px 12px;
+  text-align: left;
+  color: var(--texto-secundario);
+  font-weight: 500;
+}
+
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--borde);
+  color: var(--texto);
+}
+
+tr:hover td { background: var(--fondo-card); }
+
+/* ── Ajedrez ── */
+#tablero {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(92, 74, 228, 0.3);
+}
+
+#historial {
+  background: var(--fondo-card);
+  border: 1px solid var(--borde) !important;
+  border-radius: 8px;
+  color: var(--texto-secundario);
+}
+
+#turno, #estado {
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+/* ── Formularios ── */
+form {
+  background: var(--fondo-card);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 400px;
+  margin-top: 16px;
 }

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<h1>Bienvenido, {{ usuario.nombre }}</h1>
+<p>{{ usuario.email }}</p>
+
+<h2 style="margin-top: 28px;">Tus estadísticas</h2>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; max-width: 600px; margin-top: 16px;">
+
+  <div style="background: var(--fondo-card); border: 1px solid var(--borde); border-radius: 12px; padding: 20px; text-align: center;">
+    <div style="font-size: 32px; font-weight: 700; color: var(--principal);">{{ total }}</div>
+    <div style="font-size: 13px; color: var(--texto-secundario); margin-top: 4px;">Partidas jugadas</div>
+  </div>
+
+  <div style="background: var(--fondo-card); border: 1px solid var(--acento); border-radius: 12px; padding: 20px; text-align: center;">
+    <div style="font-size: 32px; font-weight: 700; color: var(--acento);">{{ victorias }}</div>
+    <div style="font-size: 13px; color: var(--texto-secundario); margin-top: 4px;">Victorias</div>
+  </div>
+
+  <div style="background: var(--fondo-card); border: 1px solid var(--error); border-radius: 12px; padding: 20px; text-align: center;">
+    <div style="font-size: 32px; font-weight: 700; color: var(--error);">{{ derrotas }}</div>
+    <div style="font-size: 13px; color: var(--texto-secundario); margin-top: 4px;">Derrotas</div>
+  </div>
+
+  <div style="background: var(--fondo-card); border: 1px solid var(--borde); border-radius: 12px; padding: 20px; text-align: center;">
+    <div style="font-size: 32px; font-weight: 700; color: var(--texto-secundario);">{{ empates }}</div>
+    <div style="font-size: 13px; color: var(--texto-secundario); margin-top: 4px;">Empates</div>
+  </div>
+
+</div>
+
+{% if total > 0 %}
+<div style="margin-top: 20px; max-width: 600px; background: var(--fondo-card); border: 1px solid var(--borde); border-radius: 12px; padding: 20px;">
+  <div style="font-size: 13px; color: var(--texto-secundario); margin-bottom: 8px;">Tasa de victorias</div>
+  <div style="background: var(--borde); border-radius: 99px; height: 10px; overflow: hidden;">
+    {% set porcentaje = (victorias / total * 100) | round | int %}
+    <div style="background: linear-gradient(90deg, var(--principal), var(--acento)); height: 100%; width: {{ porcentaje }}%;"></div>
+  </div>
+  <div style="font-size: 13px; color: var(--texto); margin-top: 6px;">{{ (victorias / total * 100) | round | int }}%</div>
+</div>
+{% endif %}
+
+<div style="margin-top: 24px; display: flex; gap: 12px;">
+  <a href="{{ url_for('ajedrez.jugar') }}"><button>Jugar ajedrez</button></a>
+  <a href="{{ url_for('ajedrez.historial') }}"><button style="background: transparent; border: 1px solid var(--principal); color: var(--principal);">Ver partidas</button></a>
+</div>
+
+{% endblock %}

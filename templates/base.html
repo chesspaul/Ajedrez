@@ -17,6 +17,7 @@
       <a href="{{ url_for('auth.logout') }}">Cerrar sesión</a>
       <a href="{{ url_for('ajedrez.jugar') }}">Ajedrez</a>
       <a href="{{ url_for('ajedrez.historial') }}">Mis partidas</a>
+      <a href="{{ url_for('auth.dashboard') }}">Dashboard</a>
       {% else %}
       <a href="{{ url_for('auth.login') }}">Iniciar sesión</a>
       <a href="{{ url_for('auth.registro') }}">Registrarse</a>

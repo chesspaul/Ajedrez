@@ -1,13 +1,34 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import login_user, logout_user, login_required
+from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
-from ..models import db, Usuario
+from ..models import db, Usuario, Partida
 
 auth = Blueprint("auth", __name__)
 
 @auth.route("/")
 def inicio ():
     return render_template("inicio.html")
+
+@auth.route("/dashboard")
+@login_required
+def dashboard():
+    total = Partida.query.filter_by(usuario_id=current_user.id).count()
+    victorias = Partida.query.filter_by(
+        usuario_id = current_user.id, resultado="blancas"
+    ).count()
+    derrotas = Partida.query.filter_by(
+        usuario_id = current_user.id, resultado="negras"
+    ).count()
+    empates = Partida.query.filter_by(
+        usuario_id = current_user.id, resultado="empate"
+    ).count()
+    return render_template("auth/dashboard.html",
+        usuario = current_user,
+        total = total,
+        victorias = victorias,
+        derrotas = derrotas,
+        empates = empates
+    )
 
 @auth.route("/registro", methods=["GET", "POST"])
 def registro():

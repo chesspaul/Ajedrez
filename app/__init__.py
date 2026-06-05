@@ -1,8 +1,9 @@
 from flask import Flask
 from flask_login import LoginManager
 from .models import db, Usuario
-from .ajedrez.routes import ajedrez
+from flask_socketio import SocketIO
 
+socketio = SocketIO()
 
 def create_app():
     app = Flask(__name__, template_folder="../templates", static_folder="../static")
@@ -11,6 +12,7 @@ def create_app():
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///usuarios.db"
 
     db.init_app(app)
+    socketio.init_app(app)
 
     login_manager = LoginManager(app)
     login_manager.login_view = "auth.login"
@@ -21,6 +23,7 @@ def create_app():
 
     from .auth.routes import auth
     from .notas.routes import notas
+    from .ajedrez.routes import ajedrez
 
     app.register_blueprint(auth)
     app.register_blueprint(notas)

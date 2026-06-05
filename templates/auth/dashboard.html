@@ -35,10 +35,18 @@
   <div style="font-size: 13px; color: var(--texto-secundario); margin-bottom: 8px;">Tasa de victorias</div>
   <div style="background: var(--borde); border-radius: 99px; height: 10px; overflow: hidden;">
     {% set porcentaje = (victorias / total * 100) | round | int %}
-    <div style="background: linear-gradient(90deg, var(--principal), var(--acento)); height: 100%; width: {{ porcentaje }}%;"></div>
+    <div class="barra-progreso-llena" data-porcentaje="{{ porcentaje }}" style="background: linear-gradient(90deg, var(--principal), var(--acento)); height: 100%; width: 0;"></div>
   </div>
   <div style="font-size: 13px; color: var(--texto); margin-top: 6px;">{{ (victorias / total * 100) | round | int }}%</div>
 </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var barra = document.querySelector('.barra-progreso-llena');
+    if (barra) {
+      barra.style.width = barra.dataset.porcentaje + '%';
+    }
+  });
+</script>
 {% endif %}
 
 <div style="margin-top: 24px; display: flex; gap: 12px;">

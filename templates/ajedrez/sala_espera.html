@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<h1>Partidas en línea</h1>
+<p>Crea una partida nueva o únete a una existente.</p>
+
+<form method="POST" action="{{ url_for('ajedrez.crear_sala') }}">
+  <button type="submit">+ Crear partida</button>
+</form>
+
+<h2 style="margin-top: 28px;">Salas disponibles</h2>
+
+{% if salas %}
+<table style="margin-top: 16px;">
+  <thead>
+    <tr>
+      <th>Código</th>
+      <th>Jugador (blancas)</th>
+      <th>Unirse</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for codigo, sala in salas.items() %}
+    <tr>
+      <td>{{ codigo }}</td>
+      <td>{{ sala.nombre_blancas }}</td>
+      <td><a href="{{ url_for('ajedrez.partida_online', codigo=codigo) }}">Unirse</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p style="margin-top: 12px;">No hay partidas disponibles. ¡Crea una!</p>
+{% endif %}
+
+<div style="margin-top: 24px;">
+  <a href="{{ url_for('ajedrez.jugar') }}">← Volver al modo local</a>
+</div>
+
+{% endblock %}

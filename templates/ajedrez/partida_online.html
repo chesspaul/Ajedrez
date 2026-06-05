@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<h1>Partida online</h1>
+<p>Sala: <strong>{{ codigo }}</strong> — Juegas con las <strong>{{ color }}</strong></p>
+
+<div id="estado-sala" style="margin-bottom: 12px; font-size: 14px; color: var(--texto-secundario);">
+  Esperando al oponente...
+</div>
+
+<p>Turno: <span id="turno">Blancas</span></p>
+<p id="estado"></p>
+
+<div id="tablero" style="width: 480px; margin: 20px 0;"></div>
+
+<div style="display: flex; gap: 10px; margin-bottom: 20px;">
+  <button onclick="rendirse()" style="background: transparent; border: 1px solid var(--error); color: var(--error);">Rendirse</button>
+</div>
+
+<h3>Movimientos</h3>
+<div id="historial" style="font-family: monospace; font-size: 13px; max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; max-width: 480px;"></div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+
+<script>
+  var codigo = "{{ codigo }}";
+  var miColor = "{{ color }}";
+  var juego = new Chess();
+  var historialMovimientos = [];
+  var listaParaJugar = false;
+
+  var socket = io();
+
+  var tablero = Chessboard('tablero', {
+    draggable: true,
+    position: 'start',
+    orientation: miColor === 'blancas' ? 'white' : 'black',
+    onDragStart: onDragStart,
+    onDrop: onDrop,
+    onSnapEnd: onSnapEnd,
+    pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
+  });
+
+  socket.emit('unirse_sala', { codigo: codigo });
+
+  socket.on('sala_actualizada', function(data) {
+    var msg = 'Blancas: ' + data.blancas + ' | Negras: ' + (data.negras || 'esperando...');
+    document.getElementById('estado-sala').textContent = msg;
+    listaParaJugar = data.lista;
+    if (listaParaJugar) {
+      document.getElementById('estado-sala').textContent = msg + ' — ¡Partida iniciada!';
+    }
+  });
+
+  socket.on('pieza_movida', function(data) {
+    var movimiento = juego.move({
+      from: data.from,
+      to: data.to,
+      promotion: data.promotion
+    });
+    if (movimiento) {
+      tablero.position(juego.fen());
+      registrarMovimiento(movimiento);
+      actualizarEstado();
+    }
+  });
+
+  socket.on('partida_terminada', function(data) {
+    document.getElementById('estado').textContent = 'Partida terminada. Resultado: ' + data.resultado;
+    document.getElementById('turno').textContent = '—';
+  });
+
+  function onDragStart(source, piece) {
+    if (!listaParaJugar) return false;
+    if (juego.game_over()) return false;
+    if (miColor === 'blancas' && juego.turn() !== 'w') return false;
+    if (miColor === 'negras' && juego.turn() !== 'b') return false;
+    if (juego.turn() === 'w' && piece.search(/^b/) !== -1) return false;
+    if (juego.turn() === 'b' && piece.search(/^w/) !== -1) return false;
+  }
+
+  function onDrop(source, target) {
+    var movimiento = juego.move({
+      from: source,
+      to: target,
+      promotion: 'q'
+    });
+    if (movimiento === null) return 'snapback';
+
+    socket.emit('mover_pieza', {
+      codigo: codigo,
+      from: source,
+      to: target,
+      promotion: 'q'
+    });
+
+    registrarMovimiento(movimiento);
+    actualizarEstado();
+  }
+
+  function onSnapEnd() {
+    tablero.position(juego.fen());
+  }
+
+  function registrarMovimiento(mov) {
+    historialMovimientos.push(mov.san);
+    var num = Math.ceil(historialMovimientos.length / 2);
+    var div = document.getElementById('historial');
+    if (historialMovimientos.length % 2 === 1) {
+      div.innerHTML += '<span>' + num + '. ' + mov.san + ' </span>';
+    } else {
+      div.innerHTML += '<span>' + mov.san + '</span><br>';
+    }
+    div.scrollTop = div.scrollHeight;
+  }
+
+  function actualizarEstado() {
+    var turnoEl = document.getElementById('turno');
+    var estadoEl = document.getElementById('estado');
+
+    if (juego.in_checkmate()) {
+      var ganador = juego.turn() === 'w' ? 'Negras' : 'Blancas';
+      estadoEl.textContent = '¡Jaque mate! Ganan ' + ganador;
+      turnoEl.textContent = '—';
+      socket.emit('fin_partida', { codigo: codigo, resultado: ganador.toLowerCase() });
+      guardarPartida(ganador.toLowerCase());
+    } else if (juego.in_draw()) {
+      estadoEl.textContent = 'Empate';
+      turnoEl.textContent = '—';
+      socket.emit('fin_partida', { codigo: codigo, resultado: 'empate' });
+      guardarPartida('empate');
+    } else if (juego.in_check()) {
+      turnoEl.textContent = juego.turn() === 'w' ? 'Blancas' : 'Negras';
+      estadoEl.textContent = '¡Jaque!';
+    } else {
+      turnoEl.textContent = juego.turn() === 'w' ? 'Blancas' : 'Negras';
+      estadoEl.textContent = '';
+    }
+  }
+
+  function rendirse() {
+    if (!confirm('¿Seguro que quieres rendirte?')) return;
+    var ganador = miColor === 'blancas' ? 'negras' : 'blancas';
+    socket.emit('fin_partida', { codigo: codigo, resultado: ganador });
+    guardarPartida(ganador);
+    window.location.href = "{{ url_for('ajedrez.historial') }}";
+  }
+
+  function guardarPartida(resultado) {
+    fetch('/ajedrez/guardar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        modo: '1v1_online',
+        dificultad: null,
+        resultado: resultado,
+        movimientos: historialMovimientos.join(' ')
+      })
+    });
+  }
+</script>
+
+{% endblock %}
